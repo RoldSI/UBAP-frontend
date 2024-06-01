@@ -100,7 +100,7 @@ function Content() {
             <div className="bg-gray-200 rounded-lg shadow p-4 col-span-1 row-span-1">
                 <StatusList items={statusItems}/>
             </div>
-            <div className="bg-gray-200 rounded-lg shadow p-4 col-span-2 row-span-1">
+            <div className="bg-gray-200 rounded-lg shadow col-span-2 row-span-1 overflow-hidden">
                 <Locations/>
             </div>
         </div>
