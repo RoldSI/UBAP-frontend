@@ -4,7 +4,11 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      gridRow: {
+        'span-full': '1 / -1',
+      }
+    },
   },
   plugins: [],
 }
