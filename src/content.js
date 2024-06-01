@@ -93,12 +93,15 @@ function Content() {
     ];
     
     return (
-        <div className="grid grid-cols-1 grid-rows-2 gap-4 h-full">
-            <div className="bg-gray-200 rounded-lg shadow p-4">
+        <div className="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+            <div className="bg-gray-200 rounded-lg shadow p-4 col-span-1 row-span-1">
                 <VisualImage/>
             </div>
-            <div className="bg-gray-200 rounded-lg shadow p-4">
+            <div className="bg-gray-200 rounded-lg shadow p-4 col-span-1 row-span-1">
                 <StatusList items={statusItems}/>
+            </div>
+            <div className="bg-gray-200 rounded-lg shadow p-4 col-span-2 row-span-1">
+                <Locations/>
             </div>
         </div>
     );
