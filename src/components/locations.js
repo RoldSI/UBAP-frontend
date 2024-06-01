@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for marker icons not displaying properly
@@ -14,7 +14,23 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function Locations({ uxvs }) {
+// Create a custom icon for goals
+const goalIcon = L.divIcon({
+  className: 'custom-goal-icon',
+  html: '<div class="text-blue-500 text-xl">&#x2716;</div>', // Unicode for 'x'
+  iconSize: [20, 20],
+  iconAnchor: [12, 15],
+});
+
+// Create a custom icon for landmarks
+const landmarkIcon = L.divIcon({
+  className: 'custom-landmark-icon',
+  html: '<div class="text-red-500 text-xl">&#9733;</div>', // Unicode for 'star' symbol
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+});
+
+function Locations({ uxvs, data }) {
   const mapRef = useRef(null);
   const center = { lat: 45.52145, lng: 9.21256 }
 
@@ -34,13 +50,6 @@ function Locations({ uxvs }) {
         center={center}
         zoom={13}
         className="h-full w-full"
-        dragging={false}
-        touchZoom={false}
-        doubleClickZoom={false}
-        scrollWheelZoom={false}
-        boxZoom={false}
-        zoomControl={false}
-        keyboard={false}
         ref={mapRef}
       >
         <TileLayer
@@ -48,15 +57,34 @@ function Locations({ uxvs }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {uxvs.map((loc, index) => (
-          <Marker key={index} position={[loc.location.latitude, loc.location.longitude]}>
-            <Popup>
-              name: {loc.uvx_id}
-              <br />
-              Location: {loc.location.latitude}, {loc.location.longitude}
-              <br />
-              Goal: {loc.goal.latitude}, {loc.goal.longitude}
-            </Popup>
-          </Marker>
+          <React.Fragment key={index}>
+            <Marker position={[loc.location.latitude, loc.location.longitude]}>
+              <Popup>
+                {loc.uvx_id}
+                <br />
+                Location: {loc.location.latitude}, {loc.location.longitude}
+              </Popup>
+            </Marker>
+            <Marker position={[loc.goal.latitude, loc.goal.longitude]} icon={goalIcon}>
+              <Popup>
+                {loc.uvx_id}
+                <br />
+                Goal: {loc.goal.latitude}, {loc.goal.longitude}
+              </Popup>
+            </Marker>
+            <Polyline positions={[[loc.location.latitude, loc.location.longitude], [loc.goal.latitude, loc.goal.longitude]]} />
+          </React.Fragment>
+        ))}
+        {data.map((loc, index) => (
+          <React.Fragment key={index}>
+            <Marker position={[loc.location.latitude, loc.location.longitude]} icon={landmarkIcon}>
+              <Popup>
+                {loc.detected_object}
+                <br />
+                Location: {loc.location.latitude}, {loc.location.longitude}
+              </Popup>
+            </Marker>
+          </React.Fragment>
         ))}
       </MapContainer>
     </div>

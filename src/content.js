@@ -6,8 +6,9 @@ import StatusList from './components/status_list';
 function Content() {
   const [uxvData, setUxvData] = useState({});
   const [uxvDataArray, setUxvDataArray] = useState([]);
+  const [data, setData] = useState([]);
 
-  const fetchData = async () => {
+  const fetchUxvs = async () => {
     try {
         const response = await fetch('https://ubap-api-xs7vfm2zyq-lz.a.run.app/get/uxv');
         const result = await response.json();
@@ -22,10 +23,28 @@ function Content() {
     }
   };
 
+  const fetchData = async () => {
+    fetch('https://ubap-api-xs7vfm2zyq-lz.a.run.app/get/data')
+      .then(response => response.json())
+      .then(data => {
+        setData(data);
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  
+  }
+
   useEffect(() => {
-    fetchData(); // Fetch data initially
-    const interval = setInterval(fetchData, 5000); // Fetch data every 30 seconds
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    fetchUxvs(); // Fetch data initially
+    fetchData();
+    const intervalUxvs = setInterval(fetchUxvs, 5000); // Fetch data every 30 seconds
+    const intervalData = setInterval(fetchData, 5000); // Fetch data every 30 seconds
+    return () => {
+        clearInterval(intervalUxvs);
+        clearInterval(intervalData);
+    } // Cleanup interval on component unmount
   }, []);
 
   return (
@@ -37,7 +56,7 @@ function Content() {
         <StatusList items={uxvDataArray} />
       </div>
       <div className="bg-gray-200 rounded-lg shadow col-span-2 row-span-1 overflow-hidden">
-        <Locations uxvs={uxvDataArray} />
+        <Locations uxvs={uxvDataArray} data={data} />
       </div>
     </div>
   );
