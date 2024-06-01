@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -12,38 +12,46 @@ let DefaultIcon = L.icon({
     shadowUrl: iconShadow,
     iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
 });
-
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function Locations({ locations }) {
-  locations = locations || [
-    {
-      "goal": {
-        "latitude": 45.521626,
-        "longitude": 9.212506
-      },
-      "location": {
-        "latitude": 45.521626,
-        "longitude": 9.212506
-      },
-    }
-  ];
+function Locations({ uxvs }) {
+  const mapRef = useRef(null);
+  const center = { lat: 45.52145, lng: 9.21256 }
 
-  const defaultCenter = {
-    lat: locations.length > 0 ? locations[0].location.latitude : 0,
-    lng: locations.length > 0 ? locations[0].location.longitude : 0,
-  };
+  useEffect(() => {
+    const new_center = {
+      lat: uxvs.length > 0 ? uxvs[0].location.latitude : 45.52145,
+      lng: uxvs.length > 0 ? uxvs[0].location.longitude : 9.21256,
+    };
+    if (mapRef.current) {
+      mapRef.current.setView([new_center.lat, new_center.lng], mapRef.current.getZoom());
+    }
+  }, [uxvs]);
 
   return (
     <div className="h-full w-full">
-      <MapContainer center={defaultCenter} zoom={13} className="h-full w-full">
+      <MapContainer
+        center={center}
+        zoom={13}
+        className="h-full w-full"
+        dragging={false}
+        touchZoom={false}
+        doubleClickZoom={false}
+        scrollWheelZoom={false}
+        boxZoom={false}
+        zoomControl={false}
+        keyboard={false}
+        ref={mapRef}
+      >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {locations.map((loc, index) => (
+        {uxvs.map((loc, index) => (
           <Marker key={index} position={[loc.location.latitude, loc.location.longitude]}>
             <Popup>
+              name: {loc.uvx_id}
+              <br />
               Location: {loc.location.latitude}, {loc.location.longitude}
               <br />
               Goal: {loc.goal.latitude}, {loc.goal.longitude}
