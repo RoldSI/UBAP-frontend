@@ -1,10 +1,19 @@
 import React from 'react';
 
-function Persona() {
+function Persona({persona, setPersona}) {
+  const handleInputChange = (event) => {
+    setPersona(event.target.value);
+  };
+
   return (
-    <div>
-      <h1 className="text-xl font-bold">Persona</h1>
-      <p>You will specify the persona here.</p>
+    <div className="flex h-full">
+      <input
+        type="text"
+        value={persona}
+        onChange={handleInputChange}
+        className="border rounded p-2 flex-grow"
+        placeholder="Specify your persona here. This will determine which data is shown."
+      />
     </div>
   );
 }
