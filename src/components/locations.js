@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import React, { useEffect, useRef, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for marker icons not displaying properly
@@ -30,9 +30,18 @@ const landmarkIcon = L.divIcon({
   iconAnchor: [10, 10],
 });
 
-function Locations({ uxvs, data }) {
+// Create a custom icon for landmarks
+const imageIcon = L.divIcon({
+  className: 'custom-landmark-icon',
+  html: '<div class="text-red-500 text-xl">&#128247;</div>', // Unicode for 'camera' symbol
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+});
+
+function Locations({ uxvs, landmarks, images, setImageUrl }) {
   const mapRef = useRef(null);
-  const center = { lat: 45.52145, lng: 9.21256 }
+  const center = { lat: 45.52145, lng: 9.21256 };
+  const [rightClickLocation, setRightClickLocation] = useState(null);
 
   useEffect(() => {
     const new_center = {
@@ -43,6 +52,18 @@ function Locations({ uxvs, data }) {
       mapRef.current.setView([new_center.lat, new_center.lng], mapRef.current.getZoom());
     }
   }, [uxvs]);
+
+  // Custom hook to handle map events
+  const MapEvents = () => {
+    useMapEvents({
+      contextmenu: (e) => {
+        setRightClickLocation(e.latlng);
+        // Perform any action with the selected location
+        console.log("Right-clicked location:", e.latlng);
+      },
+    });
+    return null;
+  };
 
   return (
     <div className="h-full w-full">
@@ -75,7 +96,7 @@ function Locations({ uxvs, data }) {
             <Polyline positions={[[loc.location.latitude, loc.location.longitude], [loc.goal.latitude, loc.goal.longitude]]} />
           </React.Fragment>
         ))}
-        {data.map((loc, index) => (
+        {landmarks.map((loc, index) => (
           <React.Fragment key={index}>
             <Marker position={[loc.location.latitude, loc.location.longitude]} icon={landmarkIcon}>
               <Popup>
@@ -86,6 +107,27 @@ function Locations({ uxvs, data }) {
             </Marker>
           </React.Fragment>
         ))}
+        {images.map((loc, index) => (
+          <React.Fragment key={index}>
+            <Marker position={[loc.location.latitude, loc.location.longitude]} icon={imageIcon}>
+              <Popup>
+                Location: {loc.location.latitude}, {loc.location.longitude}
+                <br />
+                <button onClick={() => setImageUrl(loc.url)}>Set Image URL</button>
+              </Popup>
+            </Marker>
+          </React.Fragment>
+        ))}
+        {rightClickLocation && (
+          <Marker position={rightClickLocation} icon={DefaultIcon}>
+            <Popup>
+              Right-clicked location:
+              <br />
+              {rightClickLocation.lat}, {rightClickLocation.lng}
+            </Popup>
+          </Marker>
+        )}
+        <MapEvents />
       </MapContainer>
     </div>
   );
