@@ -30,7 +30,7 @@ const landmarkIcon = L.divIcon({
   iconAnchor: [10, 10],
 });
 
-// Create a custom icon for landmarks
+// Create a custom icon for images
 const imageIcon = L.divIcon({
   className: 'custom-landmark-icon',
   html: '<div class="text-red-500 text-xl">&#128247;</div>', // Unicode for 'camera' symbol
@@ -63,6 +63,11 @@ function Locations({ uxvs, landmarks, images, setImageUrl }) {
       },
     });
     return null;
+  };
+
+  // Function to handle popup open event
+  const handlePopupOpen = (locUrl) => {
+    setImageUrl(locUrl);
   };
 
   return (
@@ -109,11 +114,13 @@ function Locations({ uxvs, landmarks, images, setImageUrl }) {
         ))}
         {images.map((loc, index) => (
           <React.Fragment key={index}>
-            <Marker position={[loc.location.latitude, loc.location.longitude]} icon={imageIcon}>
+            <Marker 
+              position={[loc.location.latitude, loc.location.longitude]} 
+              icon={imageIcon} 
+              eventHandlers={{ popupopen: () => handlePopupOpen(loc.url) }}
+            >
               <Popup>
                 Location: {loc.location.latitude}, {loc.location.longitude}
-                <br />
-                <button onClick={() => setImageUrl(loc.url)}>Set Image URL</button>
               </Popup>
             </Marker>
           </React.Fragment>
